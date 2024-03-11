@@ -1,0 +1,9 @@
+featureClass:
+  shape2D: null
+imageType:
+  Original: {}
+setting:
+  label: 200
+  padDistance: 10
+  preCrop: true
+
