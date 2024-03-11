@@ -15,7 +15,7 @@ The script calculates A and B given an input of 3 masks in nrrd format (upper VB
 
 ### Running the example
 
-Set up the environment using requirements.txt (**NB** pyradiomics not working on versions of python >3.9) and use run.py to use the script on the sample masks and image. 
+Set up the environment using requirements.txt (**NB** pyradiomics may not work on versions of python >3.9) and use run.py to use the script on the sample masks and image. 
 
 ![image](https://github.com/TerMcs/quantspine/assets/66838178/875371b9-d8c4-4a95-a99d-b07827cfd871)
 
