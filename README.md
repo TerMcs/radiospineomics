@@ -1,4 +1,4 @@
-### Extractiong conventional IVD features and radiomics from T2-weighted MRI
+### Extracting conventional IVD features and radiomics from T2-weighted MRI
 This is an example of extracting 
 - A: Intervertebral disc (IVD) delta signal intensity
 - B: IVD and vertebral body (VB) conventional geometric indices (e.g. IVD height index) 
