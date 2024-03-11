@@ -13,6 +13,10 @@ The script calculates A and B given an input of 3 masks in nrrd format (upper VB
 
 - The only thing in the params files that would need to be adjusted is the label setting. This should be set to match the label of the mask.
 
+### Running the example
+
+Set up the environment using requirements.txt (**NB** pyradiomics not working on versions of python >3.9) and use run.py to use the script on the sample masks and image. 
+
 ![image](https://github.com/TerMcs/quantspine/assets/66838178/875371b9-d8c4-4a95-a99d-b07827cfd871)
 
 ![image](https://github.com/TerMcs/quantspine/assets/66838178/ceb2dfcf-d494-45bd-9182-228fe37a5d6a)
