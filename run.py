@@ -8,11 +8,11 @@ from functions import calculate_indices
 
 # Functional spinal unit (FSU) masks and the whole spine image are selected.
 # Mask list should be in the order cranial VB, IVD, caudal VB.
-fsu = ['sample_data/masks/L1_VB-P0741_756_IMG00004.nrrd',
-       'sample_data/masks/L1_L2_IVD-P0741_756_IMG00004.nrrd', 
-       'sample_data/masks/L2_VB-P0741_756_IMG00004.nrrd']
+fsu = ['sample_data/masks/L1_VB-P0741_756_IMG00007.nrrd',
+       'sample_data/masks/L1_L2_IVD-P0741_756_IMG00007.nrrd', 
+       'sample_data/masks/L2_VB-P0741_756_IMG00007.nrrd']
 
-image = 'sample_data/images/P0741_756_IMG00004.nrrd'
+image = 'sample_data/images/P0741_756_IMG00007.nrrd'
 
 
 ###################################################################
