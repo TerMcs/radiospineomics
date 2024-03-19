@@ -7,9 +7,13 @@ import yaml
 from functions import calculate_indices
 
 
-mask_directory = 'sample_data/masks/'
-image_directory = 'sample_data/images/'
-ivd_mask_list = [os.path.basename(x) for x in glob.glob(mask_directory + '*IVD*.nrrd')]
+data_directory = 'sample_data/'
+
+participant_ids = [d for d in os.listdir(data_directory) if os.path.isdir(os.path.join(data_directory, d))]
+
+ivd_mask_list = []
+for participant_id in participant_ids:
+    ivd_mask_list.extend([os.path.basename(x) for x in glob.glob(data_directory + participant_id + '/masks/' + '*IVD*.nrrd')])
 
 # Settings:
 shape_params_file = 'shape_params.yaml'
@@ -23,12 +27,15 @@ shape_features = []
 
 for ivd in ivd_mask_list:
 
-    slice_id = ivd.split('-')[1]
-    upper_vb = ivd.split('_')[0] + '_VB-' + slice_id
-    lower_vb = ivd.split('_')[1] + '_VB-' + slice_id
+    participant_id = ivd.split('-')[1].split('.')[0]
+    upper_vb = ivd.split('_')[0] + '_VB-' + participant_id
+    ivd = ivd.split('.')[0]
+    lower_vb = ivd.split('_')[1] + '_VB-' + participant_id
     
-    image_filepath = image_directory + slice_id
-    fsu_filepaths = [mask_directory + upper_vb, mask_directory + ivd, mask_directory + lower_vb]
+    image_filepath = data_directory + participant_id + '/images/' + participant_id + '.nrrd'
+    fsu_filepaths = [data_directory + participant_id + '/masks/' + upper_vb + '.nrrd',
+                     data_directory + participant_id + '/masks/' + ivd + '.nrrd',
+                     data_directory + participant_id + '/masks/' + lower_vb + '.nrrd']
     
 
     ###################################################################
