@@ -519,11 +519,12 @@ def calculate_indices(fsu, image):
     caudal_vb_area = get_areas(polygons, ivd_centre)
 
     # Final calculation of indices
-    cranial_vb_height_index = cranial_vb_area / cranial_vb_diameter
-    caudal_vb_height_index = caudal_vb_area / caudal_vb_diameter
+    cranial_vb_height = cranial_vb_area / cranial_vb_diameter
+    caudal_vb_height = caudal_vb_area / caudal_vb_diameter
     bulge_area = ivd_area - central_ivd_area
     bulge_index = bulge_area / ivd_area
-    ivd_height_index = central_ivd_area / disc_diameter
+    ivd_height = central_ivd_area / disc_diameter
+    ivd_height_index = 2 * ivd_height / (cranial_vb_height + caudal_vb_height)
 
     results = {
         'cranial_vb_diameter': cranial_vb_diameter,
@@ -536,11 +537,12 @@ def calculate_indices(fsu, image):
         'ivd_area': ivd_area,
         'cranial_vb_area': cranial_vb_area,
         'caudal_vb_area': caudal_vb_area,
-        'cranial_vb_height_index': cranial_vb_height_index,
-        'caudal_vb_height_index': caudal_vb_height_index,
+        'cranial_vb_height': cranial_vb_height,
+        'caudal_vb_height': caudal_vb_height,
         'bulge_area': bulge_area,
         'bulge_index': bulge_index,
-        'ivd_height_index': ivd_height_index,
+        'ivd_height': ivd_height,
+        'ivd_height_index': ivd_height_index
         'normalised_delta_si': normalised_delta_si
     }
 
