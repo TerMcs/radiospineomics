@@ -8,3 +8,5 @@ This is an example of extracting:
 Set up the environment using pip andrequirements.txt (**NB** pyradiomics may not work on versions of python >3.9) and use run.py to use the script on the sample masks and image. 
 
 This code was used in the following study: [doi.org/10.1101/2025.04.01.25325008](https://doi.org/10.1101/2025.04.01.25325008). Additional scripts for image mask perturbations and statistical analysis used in the paper are in the notebooks folder. 
+
+![](figure.png)
