@@ -11,7 +11,6 @@ mask_directory = 'sample_data/masks/'
 image_directory = 'sample_data/images/'
 ivd_mask_list = [os.path.basename(x) for x in glob.glob(mask_directory + '*IVD*.nrrd')]
 
-# Settings:
 shape_params_file = 'shape_params.yaml'
 texture_params_file = 'texture_params.yaml'
 resamplings = [[0,0], [0.27, 0.27], [0.135, 0.135]]
@@ -24,19 +23,22 @@ shape_features = []
 for ivd in ivd_mask_list:
 
     slice_id = ivd.split('-')[1]
+    participant_id = slice_id.split('_IMG')[0]
+    level = ivd.split('_IVD')[0]
     upper_vb = ivd.split('_')[0] + '_VB-' + slice_id
     lower_vb = ivd.split('_')[1] + '_VB-' + slice_id
     
     image_filepath = image_directory + slice_id
     fsu_filepaths = [mask_directory + upper_vb, mask_directory + ivd, mask_directory + lower_vb]
-    
+    csf_mask_filepath = mask_directory + level + '_CSF-' + participant_id + '.nrrd'
+    level = int(level[1])
 
     ###################################################################
     ###### Calculate conventional features ############################
     ###################################################################
 
     try:
-        geometry_results = calculate_indices(fsu_filepaths, image_filepath)
+        geometry_results = calculate_indices(fsu_filepaths, image_filepath, csf_mask_filepath, level)
         geometry_results = pd.DataFrame(geometry_results, index=[0])
         geometry_results['id'] = ivd
     

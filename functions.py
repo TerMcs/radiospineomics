@@ -7,37 +7,57 @@ import scipy.stats as stats
 import shapely
 
 from shapely.ops import linemerge, unary_union, polygonize
-from sklearn import mixture
+from sklearn.mixture import GaussianMixture
 
 
-def get_delta_si(masks, image):
-
+def image_mean(image):
     mean = np.mean(image)
     std = np.std(image)
-    outliers_removed = image[image < mean + 3 * std]
-    outliers_removed = outliers_removed[outliers_removed > mean - 3 * std]
-    mean_image_intensity = np.mean(outliers_removed)
+    outlier_threshold = 3
+    lower_bound = mean - outlier_threshold * std
+    upper_bound = mean + outlier_threshold * std
+    filtered_pixels = image[(image > lower_bound) & (image < upper_bound)]
+    return np.mean(filtered_pixels)
 
-    int_mask_pixel_values = image[masks[1].astype(bool)]
+
+def csf_mean(image, csf_mask, level):
+    if csf_mask.shape[-1] == 1:
+        csf_mask = np.squeeze(csf_mask, axis=-1)
+
+    if csf_mask.shape != image.shape:
+        raise ValueError("csf_mask and image must have the same shape after adjustment.")
+    csf_pixels = image[csf_mask == level]
+    return np.mean(csf_pixels)
+
+
+def delta_si(ivd_mask, image):
+    mask_values = image[ivd_mask.astype(bool)]
+    f = mask_values.astype(float).reshape(-1, 1)
     
-    f = np.ravel(int_mask_pixel_values).astype(float)
-    f=f.reshape(-1,1)
-    g = mixture.GaussianMixture(n_components=2, max_iter=1000, random_state=10, covariance_type = 'full')
-    g.fit(f)
-    weights = g.weights_
-    means = g.means_
-    covars = g.covariances_
+    gmm = GaussianMixture(n_components=2, max_iter=1000, random_state=10, covariance_type='full')
+    gmm.fit(f)
 
-    x_axis = f.copy().ravel()
-    x_axis.sort()
+    x_axis = np.sort(f.ravel())
 
-    y_axis0 = stats.norm.pdf(x_axis, float(means[0][0]), np.sqrt(float(covars[0][0][0])))*weights[0] # 1st gaussian
-    y_axis1 = stats.norm.pdf(x_axis, float(means[1][0]), np.sqrt(float(covars[1][0][0])))*weights[1] # 2nd gaussian
+    y_axis0 = stats.norm.pdf(x_axis, gmm.means_[0][0], np.sqrt(gmm.covariances_[0][0][0])) * gmm.weights_[0]
+    y_axis1 = stats.norm.pdf(x_axis, gmm.means_[1][0], np.sqrt(gmm.covariances_[1][0][0])) * gmm.weights_[1]
+
+    peak0 = x_axis[np.argmax(y_axis0)]
+    peak1 = x_axis[np.argmax(y_axis1)]
+    return np.abs(peak0 - peak1)
+
+
+def get_delta_si(ivd_mask, image, csf_mask_filepath, level):
+    csf_mask, _ = nrrd.read(csf_mask_filepath)
     
-    delta_si = np.abs(x_axis[np.argmax(y_axis0)] - x_axis[np.argmax(y_axis1)])
-    normalised_delta_si = (delta_si / mean_image_intensity)
+    delta_si_value = delta_si(ivd_mask, image)
+    mean_img_intensity = image_mean(image)
+    mean_csf_intensity = csf_mean(image, csf_mask, level)
 
-    return normalised_delta_si
+    delta_si_img_norm = delta_si_value / mean_img_intensity
+    delta_si_csf_norm = delta_si_value / mean_csf_intensity
+
+    return delta_si_img_norm, delta_si_csf_norm, mean_img_intensity, mean_csf_intensity
 
 
 def get_polygons(masks):
@@ -478,7 +498,7 @@ def get_areas(polygons, ivd_centre):
     return central_ivd_area, total_ivd_area, upper_vb_area, lower_vb_area
 
 
-def calculate_indices(fsu, image):
+def calculate_indices(fsu, image, csf_mask_filepath, level):
 
     cranial_vb_mask, _ = nrrd.read(fsu[0])
     ivd_mask, _ = nrrd.read(fsu[1])
@@ -488,7 +508,7 @@ def calculate_indices(fsu, image):
 
     fsu, polygons = get_polygons(fsu)
 
-    normalised_delta_si = get_delta_si(fsu, image)
+    img_normalised_delta_si, csf_normalised_delta_si, _, _ = get_delta_si(ivd_mask, image, csf_mask_filepath, level)
 
     corners = get_vb_corners(fsu)
 
@@ -542,8 +562,9 @@ def calculate_indices(fsu, image):
         'bulge_area': bulge_area,
         'bulge_index': bulge_index,
         'ivd_height': ivd_height,
-        'ivd_height_index': ivd_height_index
-        'normalised_delta_si': normalised_delta_si
+        'ivd_height_index': ivd_height_index,
+        'img_normalised_delta_si': img_normalised_delta_si,
+        'csf_normalised_delta_si': csf_normalised_delta_si
     }
 
     return results
